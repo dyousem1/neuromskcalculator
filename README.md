@@ -94,4 +94,5 @@ If you use these calculators in academic work, please cite:
 
 ---
 
-*Last updated: November 2025*
+
+*Last updated: November 27 2025*
