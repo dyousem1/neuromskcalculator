@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiology Percentile Calculators</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #f0c040;
+            --msk-primary: #0d9488;
+            --msk-light: #14b8a6;
+            --neuro-primary: #7c3aed;
+            --neuro-light: #8b5cf6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            background: linear-gradient(180deg, #1e293b 0%, var(--bg) 100%);
+        }
+        
+        .hero h1 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--bg);
+            padding: 0.35rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        
+        .card.msk::before {
+            background: linear-gradient(90deg, var(--msk-primary), var(--msk-light));
+        }
+        
+        .card.neuro::before {
+            background: linear-gradient(90deg, var(--neuro-primary), var(--neuro-light));
+        }
+        
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .card.msk .card-icon {
+            background: linear-gradient(135deg, var(--msk-primary), var(--msk-light));
+        }
+        
+        .card.neuro .card-icon {
+            background: linear-gradient(135deg, var(--neuro-primary), var(--neuro-light));
+        }
+        
+        .card h2 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card .count {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .card .description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .card.msk .cta { color: var(--msk-light); }
+        .card.neuro .cta { color: var(--neuro-light); }
+        
+        .card .cta .arrow {
+            transition: transform 0.2s;
+        }
+        
+        .card:hover .cta .arrow {
+            transform: translateX(4px);
+        }
+        
+        .info-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .info-section h3 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .info-section p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .info-section p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.5rem 1rem;
+            margin: 1rem 0;
+        }
+        
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .metric-item .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            flex-shrink: 0;
+        }
+        
+        .metric-item.highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .metric-item.highlight .dot {
+            background: var(--accent);
+        }
+        
+        .formula-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .weight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .weight-item {
+            background: rgba(0,0,0,0.2);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+        }
+        
+        .weight-item .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .weight-item .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 2rem;
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 2rem; }
+            .hero { padding: 3rem 1.5rem 2rem; }
+            .container { padding: 1.5rem; }
+            .card { padding: 1.5rem; }
+            .info-section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Radiology Percentile Calculators</h1>
+        <p>Benchmark your academic productivity against peers in your subspecialty</p>
+        <span class="badge">Data from Scopus · November 2025</span>
+    </div>
+    
+    <div class="container">
+        <div class="cards">
+            <a href="MSK_Percentile_Calculator.html" class="card msk">
+                <div class="card-icon">🦴</div>
+                <h2>MSK Radiology</h2>
+                <div class="count">673 Radiologists</div>
+                <p class="description">Musculoskeletal radiologists from U.S. academic institutions. Compare your metrics against MSK faculty nationwide.</p>
+                <span class="cta">Open Calculator <span class="arrow">→</span></span>
+            </a>
+            
+            <a href="Neuroradiology_Percentile_Calculator.html" class="card neuro">
+                <div class="card-icon">🧠</div>
+                <h2>Neuroradiology</h2>
+                <div class="count">1,054 Radiologists</div>
+                <p class="description">Neuroradiologists from U.S. academic institutions. Compare your metrics against neuroradiology faculty nationwide.</p>
+                <span class="cta">Open Calculator <span class="arrow">→</span></span>
+            </a>
+        </div>
+        
+        <div class="info-section">
+            <h3>Available Metrics</h3>
+            <p>Each calculator provides percentile rankings across 8 bibliometric measures:</p>
+            <div class="metrics-grid">
+                <div class="metric-item"><span class="dot"></span> Total Citations</div>
+                <div class="metric-item"><span class="dot"></span> Total Papers</div>
+                <div class="metric-item"><span class="dot"></span> H-Index</div>
+                <div class="metric-item"><span class="dot"></span> First Author Papers</div>
+                <div class="metric-item"><span class="dot"></span> First Author Citations</div>
+                <div class="metric-item"><span class="dot"></span> Last Author Papers</div>
+                <div class="metric-item"><span class="dot"></span> Last Author Citations</div>
+                <div class="metric-item highlight"><span class="dot"></span> Yousem Metric ★</div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>The Yousem Metric</h3>
+            <p>A novel bibliometric measure that emphasizes leadership roles in academic publishing. First and last authorship positions indicate greater contribution and responsibility than middle authorship.</p>
+            <div class="formula-box">
+                Yousem Metric = Weighted Citations + (10 × Weighted Papers)
+            </div>
+            <div class="weight-grid">
+                <div class="weight-item">
+                    <div class="label">First / Last Author</div>
+                    <div class="value">5× Weight</div>
+                </div>
+                <div class="weight-item">
+                    <div class="label">Middle Author</div>
+                    <div class="value">1× Weight</div>
+                </div>
+            </div>
+            <p style="margin-top: 1rem;">This metric rewards researchers who lead projects (first author) or supervise them (last/senior author), providing a more nuanced view of academic contribution than simple publication or citation counts.</p>
+        </div>
+        
+        <div class="info-section">
+            <h3>How to Use</h3>
+            <p><strong>📊 Enter Your Metrics:</strong> Select your academic rank and sex (both optional), choose a metric, enter your value, and see your percentile instantly.</p>
+            <p><strong>🔍 Find by Name:</strong> Search for any radiologist in the database to view all 8 of their metrics and percentile rankings at once.</p>
+            <p>Filter by academic rank (Assistant, Associate, or Full Professor) and/or sex to compare against specific peer groups.</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>David M. Yousem, MD, MBA</strong><br>Johns Hopkins University School of Medicine</p>
+        <p style="margin-top: 1rem;">Data derived from Scopus academic database, November 2025</p>
+    </div>
+</body>
+</html>
