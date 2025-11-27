@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radiology Percentile Calculators</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent: #f0c040;
+            --msk-primary: #0d9488;
+            --msk-light: #14b8a6;
+            --neuro-primary: #7c3aed;
+            --neuro-light: #8b5cf6;
+            --leadership-primary: #0d7377;
+            --leadership-light: #14a3a8;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            background: linear-gradient(180deg, #1e293b 0%, var(--bg) 100%);
+        }
+        
+        .hero h1 {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            padding: 0.35rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        
+        .card.msk::before { background: linear-gradient(90deg, var(--msk-primary), var(--msk-light)); }
+        .card.neuro::before { background: linear-gradient(90deg, var(--neuro-primary), var(--neuro-light)); }
+        .card.leadership::before { background: linear-gradient(90deg, var(--leadership-primary), var(--leadership-light)); }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: var(--text-muted);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card.msk h2 { color: var(--msk-light); }
+        .card.neuro h2 { color: var(--neuro-light); }
+        .card.leadership h2 { color: var(--leadership-light); }
+        
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card .stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .card .stats strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        .card .arrow {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            opacity: 0.5;
+            transition: all 0.3s;
+        }
+        
+        .card:hover .arrow {
+            opacity: 1;
+            transform: translateX(4px);
+        }
+        
+        .info-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .info-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+        
+        .info-section p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        
+        .info-section ul {
+            color: var(--text-muted);
+            margin-left: 1.5rem;
+        }
+        
+        .info-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-section code {
+            background: var(--bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: var(--accent);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid #334155;
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .new-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Radiology Percentile Calculators</h1>
+        <p>Benchmark your academic productivity against peers in your subspecialty</p>
+        <span class="badge">Data from Scopus • November 2025</span>
+    </div>
+    
+    <div class="container">
+        <div class="cards">
+            <a href="Neuroradiology_Percentile_Calculator__2_.html" class="card neuro">
+                <h2>Neuroradiology</h2>
+                <p>Compare your metrics against academic neuroradiologists nationwide</p>
+                <div class="stats">
+                    <span><strong>1,054</strong> faculty</span>
+                    <span><strong>8</strong> metrics</span>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+            
+            <a href="MSK_Percentile_Calculator__2_.html" class="card msk">
+                <h2>MSK Radiology</h2>
+                <p>Compare your metrics against musculoskeletal radiologists nationwide</p>
+                <div class="stats">
+                    <span><strong>673</strong> faculty</span>
+                    <span><strong>8</strong> metrics</span>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+            
+            <a href="Leadership_Metrics_Calculator.html" class="card leadership">
+                <h2>Leadership Metrics <span class="new-badge">NEW</span></h2>
+                <p>First + Last author combined metrics for both Neuro and MSK</p>
+                <div class="stats">
+                    <span><strong>1,727</strong> faculty</span>
+                    <span><strong>4</strong> metrics</span>
+                </div>
+                <span class="arrow">→</span>
+            </a>
+        </div>
+        
+        <div class="info-section">
+            <h3>About the Yousem Metric</h3>
+            <p>The <strong>Yousem Metric (YM)</strong> is a bibliometric measure that emphasizes leadership roles in academic publishing.</p>
+            <p><strong>Formula:</strong> <code>YM = Weighted Citations + (10 × Weighted Papers)</code></p>
+            <p><strong>Weighting:</strong></p>
+            <ul>
+                <li>First/Last author positions: <strong>5× weight</strong></li>
+                <li>Middle author positions: <strong>1× weight</strong></li>
+            </ul>
+            <p>This metric rewards researchers who lead projects (first author) or supervise them (last/senior author), rather than just accumulating middle-author credits.</p>
+        </div>
+        
+        <div class="info-section">
+            <h3>About Leadership Metrics</h3>
+            <p><strong>Leadership Papers</strong> = First Author Papers + Last Author Papers</p>
+            <p><strong>Leadership Citations</strong> = First Author Citations + Last Author Citations</p>
+            <p>Both first and last authorship positions represent leadership in academic medicine — first authors lead the project execution, while last authors typically supervise as senior investigators.</p>
+        </div>
+        
+        <div class="info-section">
+            <h3>Available Metrics</h3>
+            <ul>
+                <li><strong>Total Papers</strong> – All publications in Scopus</li>
+                <li><strong>Total Citations</strong> – Cumulative citation count</li>
+                <li><strong>H-Index</strong> – Hirsch index from Scopus</li>
+                <li><strong>First Author Papers/Citations</strong> – Publications where listed first</li>
+                <li><strong>Last Author Papers/Citations</strong> – Publications where listed last (senior author)</li>
+                <li><strong>Leadership Papers/Citations</strong> – Combined first + last author metrics</li>
+                <li><strong>Yousem Metric</strong> – Weighted measure emphasizing leadership roles</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Created by David Yousem, MD, MBA • Johns Hopkins University</p>
+        <p style="margin-top: 0.5rem;">Data derived from <a href="https://www.scopus.com" target="_blank">Scopus</a> searches • November 2025</p>
+    </div>
+</body>
+</html>
